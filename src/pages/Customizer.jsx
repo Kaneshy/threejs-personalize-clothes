@@ -61,16 +61,23 @@ const Customizer = () => {
         body: JSON.stringify({
           prompt,
         })
-      })
-
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data. Status: ${response.status}`);
+      }
+  
       const data = await response.json();
+  
+      if (!data.photo) {
+        throw new Error("Unexpected response format: missing photo");
+      }
+  
+      handleDecals(type, `data:image/png;base64,${data.photo}`);
 
-      if (data) {
-        handleDecals(type, `data:image/png;base64,${data.photo}`)
-      } 
-      alert('400 Billing hard limit has been reached')
+
     } catch (error) {
-      alert(error)
+      console.log('error', error)
     } finally {
       setGeneratingImg(false);
       setActiveEditorTab("");
