@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSnapshot } from 'valtio';
 
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
+import app from '../../firebase';
+
 import config from '../config/config';
 import state from '../store';
 import { download } from '../assets';
@@ -9,11 +17,20 @@ import { downloadCanvasToImage, reader } from '../config/helpers';
 import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components';
+import { AddCard } from '../actions/gallery';
 
 const Customizer = () => {
   const snap = useSnapshot(state);
+  const [inputs, setInputs] = useState({});
+
+  const [img, setImg] = useState(undefined);
+  const [video, setVideo] = useState(undefined);
+  const [imgPerc, setImgPerc] = useState(0);
+  const [videoPerc, setVideoPerc] = useState(0);
+  const [newInput, setNewInput] = useState([])
 
   const [file, setFile] = useState('');
+  const [isActive, setisActive] = useState(false)
 
   const [prompt, setPrompt] = useState('');
   const [generatingImg, setGeneratingImg] = useState(false);
@@ -62,17 +79,17 @@ const Customizer = () => {
           prompt,
         })
       });
-  
+
       if (!response.ok) {
         throw new Error(`Failed to fetch data. Status: ${response.status}`);
       }
-  
+
       const data = await response.json();
-  
+
       if (!data.photo) {
         throw new Error("Unexpected response format: missing photo");
       }
-  
+
       handleDecals(type, `data:image/png;base64,${data.photo}`);
 
 
@@ -117,14 +134,108 @@ const Customizer = () => {
       }
     })
   }
-
+  const handleChange = (type, file) => {
+    console.log('dfd', type)
+    console.log('runing', file)
+    setNewInput((prev) => {
+      return { ...prev, [type]: file };
+    });
+  };
   const readFile = (type) => {
+    handleChange(type, file)
     reader(file)
       .then((result) => {
         handleDecals(type, result);
         setActiveEditorTab("");
       })
   }
+
+  useEffect(() => {
+
+    const handledataG = async () => {
+      console.log('ddddddd', inputs.imgUrl)
+      await AddCard({
+        next: snap.logoDecal,
+        logoUrl: inputs.imgUrl || 'default',
+        patternUrl: inputs.imgFullUrl || 'default',
+        color: snap.color,
+        title: 'New target',
+        desc: 'set your description'
+      });
+    }
+    handledataG()
+  }, [inputs])
+  
+
+  const handleData = async () => {
+    console.log('ddddddd', newInput)
+    await handlefirebasedata()
+    console.log('ddddddd', inputs.imgUrl)
+    
+  };
+  const handlefirebasedata = async () => {
+    'is runing upload'
+    newInput.logo && await uploadFile(newInput.logo, "imgUrl");
+    newInput.full && await uploadFile(newInput.full, "imgFullUrl");
+
+  }
+
+
+  const uploadFile = async (file, urlType) => {
+    const storage = getStorage(app);
+    // const fileName = new Date().getTime() + file.name;
+    // const storageRef = ref(storage, fileName);
+    // const uploadTask = uploadBytesResumable(storageRef, file);
+
+    const storageRef = ref(storage, 'images/' + file.name);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        urlType === "imgUrl" ? setImgPerc(Math.round(progress)) : setVideoPerc(Math.round(progress));
+        switch (snapshot.state) {
+          case "paused":
+            console.log("Upload is paused");
+            break;
+          case "running":
+            console.log("Upload is running");
+            break;
+          default:
+            break;
+        }
+      },
+      (error) => {
+        // A full list of error codes is available at
+        // https://firebase.google.com/docs/storage/web/handle-errors
+        switch (error.code) {
+          case 'storage/unauthorized':
+            // User doesn't have permission to access the object
+            break;
+          case 'storage/canceled':
+            // User canceled the upload
+            break;
+
+          // ...
+
+          case 'storage/unknown':
+            // Unknown error occurred, inspect error.serverResponse
+            break;
+        }
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setInputs((prev) => {
+            return { ...prev, [urlType]: downloadURL };
+          });
+        });
+      }
+    );
+  };
+
+
 
   return (
     <AnimatePresence>
@@ -161,6 +272,16 @@ const Customizer = () => {
               customStyles="w-fit px-4 py-2.5 font-bold text-sm"
             />
           </motion.div>
+
+
+          <div
+            className="absolute bg-pink-800 rounded-xl p-4 z-10 top-20 right-5"
+          >
+            <button
+              onClick={handleData}
+              className=""
+            >search</button>
+          </div>
 
           <motion.div
             className='filtertabs-container'

@@ -90,3 +90,31 @@ input[type="file"] {
 .sketch-picker > div:nth-child(3) {
   display: none !important;
 }
+
+
+.home-sv-a {
+  width: 100%;
+  padding: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  margin: 0 auto;
+  gap: 20px;
+  row-gap: 50px;
+}
+
+.header-max-h {
+  max-height: 780px;
+  overflow: hidden;
+}
+
+
+.max-w-header {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.hover-filter-a:hover {
+  transform: scale(1.2);
+  filter: brightness(50%);
+  transition: transform 0.5s ease-in-out, filter 0.5s ease-in-out;
+}

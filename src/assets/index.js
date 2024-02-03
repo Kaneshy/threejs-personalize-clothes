@@ -1,4 +1,4 @@
-import ai from "./ai.png";
+import ai from "./openai.svg";
 import fileIcon from "./file.png";
 import swatch from "./swatch.png";
 import download from "./download.png";

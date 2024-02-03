@@ -5,18 +5,20 @@ import CustomButton from './CustomButton'
 const FilePicker = ({ file, setFile, readFile }) => {
   return (
     <div className="filepicker-container">
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col gap-y-4">
+        <h1 className='text-gray-100 text-xs truncate'>LOGO or PATTERN</h1>
         <input 
           id="file-upload"
           type="file"
           accept="image/*"
           onChange={(e) => setFile(e.target.files[0])}
         />
-        <label htmlFor="file-upload" className="filepicker-label">
+        
+        <label htmlFor="file-upload" className="filepicker-label bg-white">
           Upload File
         </label>
 
-        <p className="mt-2 text-gray-500 text-xs truncate">
+        <p className="mt-2 border py-2 px-1 rounded text-gray-100 text-xs truncate">
           {file === '' ? "No file selected" : file.name}
         </p>
       </div>

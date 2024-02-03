@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useRef } from 'react';
 import { easing } from 'maath';
 import { useSnapshot } from 'valtio';
 import { useFrame } from '@react-three/fiber';
 import { Decal, useGLTF, useTexture } from '@react-three/drei';
+import { useDrag } from 'react-use-gesture';
 
 import state from '../store';
 
@@ -13,12 +14,21 @@ const Shirt = () => {
   const logoTexture = useTexture(snap.logoDecal);
   const fullTexture = useTexture(snap.fullDecal);
 
-  useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta));
+  const shirtGroup = useRef();
+
+  useFrame((state, delta) => {
+    easing.dampC(materials.lambert1.color, snap.color, 0.25, delta);
+  });
+
+  const bind = useDrag(({ offset: [x, y] }) => {
+    // Rotate the shirt group based on mouse drag
+    shirtGroup.current.rotation.y = x / 100;
+  });
 
   const stateString = JSON.stringify(snap);
 
   return (
-    <group key={stateString}>
+    <group key={stateString} ref={shirtGroup} {...bind()}>
       <mesh
         castShadow
         geometry={nodes.T_Shirt_male.geometry}
@@ -48,7 +58,7 @@ const Shirt = () => {
         )}
       </mesh>
     </group>
-  )
-}
+  );
+};
 
-export default Shirt
+export default Shirt;
