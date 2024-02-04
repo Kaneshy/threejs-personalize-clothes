@@ -1,13 +1,26 @@
 export const downloadCanvasToImage = () => {
   const canvas = document.querySelector("canvas");
+  console.log('dd', canvas)
   const dataURL = canvas.toDataURL();
   const link = document.createElement("a");
 
   link.href = dataURL;
+  console.log(link, 'ddd')
   link.download = "canvas.png";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+};
+
+export const downloadCanvas = async () => {
+  const canvas = document.querySelector("canvas");
+  const dataURL = canvas.toDataURL();
+  const blob = await fetch(dataURL).then((res) => res.blob());
+
+  // Create a File from the Blob
+  const file = new File([blob], 'canvas_image.png', { type: 'image/png' });
+
+  return file;
 };
 
 export const reader = (file) =>

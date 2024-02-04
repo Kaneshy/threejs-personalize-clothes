@@ -25,18 +25,12 @@ const Gallery = () => {
         <div className='home-sv-a  '>
           {targetsA && targetsA.map((x, index) => {
             return (
-              <Link key={index} className='rounded-xl shadow-[0px_10px_1px_rgba(221,_221,_221,_1),_0_10px_20px_rgba(204,_204,_204,_1)]' to={`/capitulos/${index}`}>
-                <div style={{backgroundColor: x.color}} className={`p-2  flex flex-col min-h-60  `}>
+              <Link to={`/Test/${x._id}`} key={index} className='rounded-xl shadow-[0px_10px_1px_rgba(221,_221,_221,_1),_0_10px_20px_rgba(204,_204,_204,_1)]' >
+                <div style={{backgroundColor: x.color}} className={`p-2  flex flex-col  `}>
                   <img
                     width={150}
                     className="hover-filter-a w-full  rounded-xl object-fill  "
-                    src={x.logoUrl}
-                    alt="logourl"
-                  />
-                  <img
-                    width={150}
-                    className="hover-filter-a w-full  rounded-xl object-fill  "
-                    src={x.patternUrl}
+                    src={x.thumbnailUrl}
                     alt="patternurl"
                   />
 

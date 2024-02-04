@@ -12,12 +12,9 @@ import {
   Route,
 } from "react-router-dom";
 
-
 function App() {
-
   return (
     <Router>
-
       <Navbar />
       <Routes>
         <Route exact path="/" element={
@@ -29,6 +26,7 @@ function App() {
           </main>
         } />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/test/:id" element={<Test />} />
       </Routes>
     </Router>
   )

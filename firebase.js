@@ -5,7 +5,7 @@ import { getAuth, GoogleAuthProvider } from 'firebase/auth'
 
 
 const firebaseConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE,
+    apiKey: "AIzaSyBtGnHJ7LjtvG5GCnJAkv6wxNwwbgy4RCA",
     authDomain: "d-customizer.firebaseapp.com",
     projectId: "d-customizer",
     storageBucket: "d-customizer.appspot.com",

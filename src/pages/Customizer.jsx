@@ -13,7 +13,7 @@ import app from '../../firebase';
 import config from '../config/config';
 import state from '../store';
 import { download } from '../assets';
-import { downloadCanvasToImage, reader } from '../config/helpers';
+import { downloadCanvas, downloadCanvasToImage, reader } from '../config/helpers';
 import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components';
@@ -153,9 +153,9 @@ const Customizer = () => {
   useEffect(() => {
 
     const handledataG = async () => {
-      console.log('ddddddd', inputs.imgUrl)
       await AddCard({
         next: snap.logoDecal,
+        thumbnailUrl: inputs.canvasUrl,
         logoUrl: inputs.imgUrl || 'default',
         patternUrl: inputs.imgFullUrl || 'default',
         color: snap.color,
@@ -165,16 +165,20 @@ const Customizer = () => {
     }
     handledataG()
   }, [inputs])
+
   
 
   const handleData = async () => {
     console.log('ddddddd', newInput)
+   
     await handlefirebasedata()
     console.log('ddddddd', inputs.imgUrl)
     
   };
   const handlefirebasedata = async () => {
-    'is runing upload'
+    const canvasUrl = await downloadCanvas()
+    console.log('oo', canvasUrl)
+    canvasUrl && await uploadFile(canvasUrl, "canvasUrl");
     newInput.logo && await uploadFile(newInput.logo, "imgUrl");
     newInput.full && await uploadFile(newInput.full, "imgFullUrl");
 
@@ -281,6 +285,9 @@ const Customizer = () => {
               onClick={handleData}
               className=""
             >search</button>
+            <div className='hidden'>
+            <canvas  width="400" height="200"></canvas>
+            </div>
           </div>
 
           <motion.div

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const AddCard = async ({ logoUrl, patternUrl, color, title, desc, next }) => {
+export const AddCard = async ({ logoUrl, patternUrl, color, title, desc, next, thumbnailUrl }) => {
 
     const base64String = next
 
@@ -26,7 +26,7 @@ export const AddCard = async ({ logoUrl, patternUrl, color, title, desc, next })
     console.log(logoUrl, patternUrl, color, title, desc)
     try {
         const res = await axios.post('http://localhost:8080/api/gallery', {
-            logoUrl, patternUrl, color, title, desc
+            logoUrl, patternUrl, color, title, desc, thumbnailUrl
         })
         console.log(res.data, res.status)
     } catch (error) {
@@ -43,3 +43,14 @@ export const getCards = async () => {
         console.log(error)
     }
 }
+
+export const TargetbyId = async ({id}) => {
+    try {
+        const res = await axios.get(`http://localhost:8080/api/gallery/${id}`)
+        console.log('jjjjj', res.data, res.status)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
