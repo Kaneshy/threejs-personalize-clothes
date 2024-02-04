@@ -29,7 +29,7 @@ const Home = () => {
                     <motion.div className='home-content' {...headContainerAnimation}>
                         <motion.div {...headTextAnimation}>
                             <h1 className='head-text'>
-                                LET'S <br className='xl:block hidden' /> DO IT.
+                                LET'S <br/> DO IT.
                             </h1>
                         </motion.div>
                         <motion.div
@@ -48,12 +48,6 @@ const Home = () => {
                             handleClick={()=> state.intro = false}
                             customStyles='w-fit px-4 py-2.5 font-bold text-sm'
                             />
-                           
-                            <Link 
-                            to={'/about'}
-                            customStyles='w-fit px-4 py-2.5 font-bold text-sm'
-                            >go</Link>
-
                         </motion.div>
                     </motion.div>
                 </motion.section>

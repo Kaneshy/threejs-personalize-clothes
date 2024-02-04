@@ -18,6 +18,7 @@ import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components';
 import { AddCard } from '../actions/gallery';
+import { redirect } from "react-router-dom";
 
 const Customizer = () => {
   const snap = useSnapshot(state);
@@ -28,6 +29,7 @@ const Customizer = () => {
   const [imgPerc, setImgPerc] = useState(0);
   const [videoPerc, setVideoPerc] = useState(0);
   const [newInput, setNewInput] = useState([])
+  const [testB, settestB] = useState(1)
 
   const [file, setFile] = useState('');
   const [isActive, setisActive] = useState(false)
@@ -150,47 +152,61 @@ const Customizer = () => {
       })
   }
 
-  useEffect(() => {
 
-    const handledataG = async () => {
-      await AddCard({
-        next: snap.logoDecal,
-        thumbnailUrl: inputs.canvasUrl,
-        logoUrl: inputs.imgUrl || 'default',
-        patternUrl: inputs.imgFullUrl || 'default',
-        color: snap.color,
-        title: 'New target',
-        desc: 'set your description'
-      });
-    }
-    handledataG()
-  }, [inputs])
 
-  
+
 
   const handleData = async () => {
-    console.log('ddddddd', newInput)
-   
+    console.log('handle data')
     await handlefirebasedata()
-    console.log('ddddddd', inputs.imgUrl)
-    
   };
   const handlefirebasedata = async () => {
+    console.log('handle handlefirebasedata')
     const canvasUrl = await downloadCanvas()
-    console.log('oo', canvasUrl)
-    canvasUrl && await uploadFile(canvasUrl, "canvasUrl");
-    newInput.logo && await uploadFile(newInput.logo, "imgUrl");
-    newInput.full && await uploadFile(newInput.full, "imgFullUrl");
+    
+    if (newInput.logo) {
+      console.log('2')
+      await uploadFile(newInput.logo, "imgUrl");
+    }
+    
+    if (newInput.full) {
+      console.log('3', inputs.length)
+      await uploadFile(newInput.full, "imgFullUrl");
+    }
+    if (canvasUrl) {
+      console.log('1')
+      await uploadFile(canvasUrl, "canvasUrl");
+    }
+
 
   }
+  useEffect(() => {
+    console.log('google', newInput, inputs)
+    if(inputs.canvasUrl) {
+      console.log('4', inputs)
+      const handledataG = async () => {
+    
+        const res = await AddCard({
+          next: snap.logoDecal,
+          thumbnailUrl: inputs.canvasUrl,
+          logoUrl: inputs.imgUrl || 'default',
+          patternUrl: inputs.imgFullUrl || 'default',
+          color: snap.color,
+          title: 'New target',
+          desc: 'set your description'
+        });
+        if(res===200) {
+          return redirect('/Gallery')
+        }
+      }
+      handledataG()
+    }
+  }, [inputs])
+  
 
 
   const uploadFile = async (file, urlType) => {
     const storage = getStorage(app);
-    // const fileName = new Date().getTime() + file.name;
-    // const storageRef = ref(storage, fileName);
-    // const uploadTask = uploadBytesResumable(storageRef, file);
-
     const storageRef = ref(storage, 'images/' + file.name);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -279,14 +295,14 @@ const Customizer = () => {
 
 
           <div
-            className="absolute bg-pink-800 rounded-xl p-4 z-10 top-20 right-5"
+            className="absolute hover:bg-white font-bold text-sm bg-neutral-200 rounded-lg py-2 px-4 z-10 top-20 right-5"
           >
             <button
               onClick={handleData}
               className=""
-            >search</button>
+            >Save</button>
             <div className='hidden'>
-            <canvas  width="400" height="200"></canvas>
+              <canvas width="200" height="200"></canvas>
             </div>
           </div>
 

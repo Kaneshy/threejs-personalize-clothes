@@ -16,9 +16,9 @@ export const downloadCanvas = async () => {
   const canvas = document.querySelector("canvas");
   const dataURL = canvas.toDataURL();
   const blob = await fetch(dataURL).then((res) => res.blob());
-
+  const randomNumber = Math.floor(Math.random() * 5000);
   // Create a File from the Blob
-  const file = new File([blob], 'canvas_image.png', { type: 'image/png' });
+  const file = new File([blob], `canvas_image_${randomNumber}.png`, { type: 'image/png' });
 
   return file;
 };

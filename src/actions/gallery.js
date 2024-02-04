@@ -18,7 +18,6 @@ export const AddCard = async ({ logoUrl, patternUrl, color, title, desc, next, t
 
     // Create a Blob from the Uint8Array
     const blob = new Blob([uint8Array], { type: 'image/jpeg' });
-    console.log('dfd', blob)
 
     // Create an object URL for the Blob
     const imageUrl = URL.createObjectURL(blob);
@@ -28,9 +27,10 @@ export const AddCard = async ({ logoUrl, patternUrl, color, title, desc, next, t
         const res = await axios.post('http://localhost:8080/api/gallery', {
             logoUrl, patternUrl, color, title, desc, thumbnailUrl
         })
-        console.log(res.data, res.status)
+        return res.status
     } catch (error) {
         console.log(error)
+        return error.message
     }
 }
 
@@ -53,4 +53,16 @@ export const TargetbyId = async ({id}) => {
         console.log(error)
     }
 }
+
+export const deletebyId = async ({id}) => {
+    try {
+        const res = await axios.delete(`http://localhost:8080/api/gallery/${id}`)
+        console.log('jjjjj', res.data, res.status)
+        return res.data
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
 
