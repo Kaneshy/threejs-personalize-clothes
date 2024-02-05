@@ -145,6 +145,7 @@ const Customizer = () => {
   };
   const readFile = (type) => {
     handleChange(type, file)
+    console.log('dd', type, file)
     reader(file)
       .then((result) => {
         handleDecals(type, result);

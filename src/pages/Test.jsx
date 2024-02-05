@@ -2,20 +2,100 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { TargetbyId } from '../actions/gallery'
 import CanvasModelTest from '../canvas/indexTest'
+import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components';
+import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants';
+import { downloadCanvas, downloadCanvasToImage, reader } from '../config/helpers';
+import { useSnapshot } from 'valtio';
+import state from '../store';
+import CanvasModel from '../canvas';
 
 const Test = () => {
+  const snap = useSnapshot(state);
+  console.log('bera', snap)
   const { id } = useParams()
   const [data, setdata] = useState({})
+  const [file, setFile] = useState('');
+  const [activeEditorTab, setActiveEditorTab] = useState("");
+  const [activeFilterTab, setActiveFilterTab] = useState({
+    logoShirt: true,
+    stylishShirt: false,
+  })
 
   useEffect(() => {
     const fetchTarget = async () => {
       const res = await TargetbyId({
         id: id
       })
+      console.log('kk', res)
       setdata(res)
     }
     fetchTarget()
   }, [])
+
+  const readFile = (type) => {
+    reader(file)
+      .then((result) => {
+        handleDecals(type, result);
+        setActiveEditorTab("");
+      })
+  }
+
+  const generateTabContent = () => {
+    switch (activeEditorTab) {
+      case "colorpicker":
+        return <ColorPicker />
+      case "filepicker":
+        return <FilePicker
+          file={file}
+          setFile={setFile}
+          readFile={readFile}
+        />
+      case "aipicker":
+        return <AIPicker
+          prompt={prompt}
+          setPrompt={setPrompt}
+          generatingImg={generatingImg}
+          handleSubmit={handleSubmit}
+        />
+      default:
+        return null;
+    }
+  }
+
+
+  const handleDecals = (type, result) => {
+    const decalType = DecalTypes[type];
+
+    state[decalType.stateProperty] = result;
+
+    if (!activeFilterTab[decalType.filterTab]) {
+      handleActiveFilterTab(decalType.filterTab)
+    }
+  }
+
+  const handleActiveFilterTab = (tabName) => {
+    switch (tabName) {
+      case "logoShirt":
+        state.isLogoTexture = !activeFilterTab[tabName];
+        break;
+      case "stylishShirt":
+        state.isFullTexture = !activeFilterTab[tabName];
+        break;
+      default:
+        state.isLogoTexture = true;
+        state.isFullTexture = false;
+        break;
+    }
+
+    // after setting the state, activeFilterTab is updated
+
+    setActiveFilterTab((prevState) => {
+      return {
+        ...prevState,
+        [tabName]: !prevState[tabName]
+      }
+    })
+  }
 
   // show tab content depending on the activeTab
 
@@ -25,12 +105,26 @@ const Test = () => {
   return (
     <main className='relative'>
       <div className='h-screen  '>
-        <CanvasModelTest />
-        <div className='  p-4 top-0 absolute left-0   '>
-          <div className={`p-2 w-full  rounded-xl gap-6 bg-white flex flex-col `}>
+        <CanvasModel />
 
-            <section>
+        <div className='absolute  p-4 top-0  left-0   '>
+          <div className={`p-2 w-full  overflow-auto h-screen  rounded-xl gap-6 bg-white flex flex-col `}>
+
+            <section className='p-4 flex flex-col gap-4'>
               <h1 className='text-center font-bold'>New Proyect</h1>
+              <div className="flex items-center ">
+                <div className="flex justify-around w-full tabs">
+                  {EditorTabs.map((tab) => (
+                    <Tab
+                      key={tab.name}
+                      tab={tab}
+                      handleClick={() => setActiveEditorTab(tab.name)}
+                    />
+                  ))}
+
+                  {generateTabContent()}
+                </div>
+              </div>
               <div className='flex flex-col gap-y-1'>
                 <span className='text-small-regular'>385 purchased in the last 7 days</span>
                 <h1 className='text-heading2-bold'>New Proyect</h1>
